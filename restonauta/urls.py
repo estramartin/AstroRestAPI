@@ -28,6 +28,8 @@ from products.Api.router import ruoter_product
 from tables.Api.ruoter import router_table
 from orders.Api.router import router_order
 from payments.Api.router import router_payment
+from weather.views import clima
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -56,6 +58,7 @@ urlpatterns = [
     path('api/', include(router_table.urls)),
     path('api/', include(router_order.urls)),
     path('api/', include(router_payment.urls)),
+    path('weather-data/', clima, name="clima"),
 ]
 
 
