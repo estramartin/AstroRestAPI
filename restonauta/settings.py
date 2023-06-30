@@ -36,6 +36,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+
+# TOMORROW_IO
+
+TOMORROWIO_URL = env.str('TOMORROWIO_URL')
+TOMORROWIO_COORDINATES = env.str('TOMORROWIO_COORDINATES')
+TOMORROWIO_TIME_RANGE = env.str('TOMORROWIO_TIME_RANGE')
+TOMORROWIO_API_KEY = env.str('TOMORROWIO_API_KEY')
+
+# CELERY
+
+CELERY_HOST=env.str('CELERY_HOST')
+CELERY_USER=env.str('CELERY_USER')
+CELERY_PASSWORD=env.str('CELERY_PASSWORD')
+CELERY_PORT=env.str('CELERY_PORT')
+
 # POSTGRESQL
 
 POSTGRESQL_HOST = env.str('POSTGRESQL_HOST')
@@ -47,6 +62,7 @@ POSTGRESQL_DATABASE = env.str('POSTGRESQL_DATABASE')
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,13 +74,15 @@ INSTALLED_APPS = [
     'drf_yasg',
     "corsheaders",
     "django_filters",
+    'django_celery_beat',
 
     'users',
     'categorias',
     'products',
     'tables',
     'orders',
-    'payments'
+    'payments',
+    'weather',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +128,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'restonauta.wsgi.application'
 
+ASGI_APPLICATION = 'restonauta.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # O utiliza 'asgi_channels.backends.ChannelsBackend' para producción
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -122,6 +147,7 @@ DATABASES = {
         'PASSWORD':  POSTGRESQL_PASSWORD,
         'HOST': POSTGRESQL_HOST,
         'PORT': POSTGRESQL_PORT,
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -131,20 +157,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation\
-        .UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation\
-        .MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation\
-            .CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation\
-            .NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -154,7 +176,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Cordoba'
 
 USE_I18N = True
 
@@ -188,3 +210,25 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
 }
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+
+CELERY_IMPORTS = ('weather.tasks',)
+
+CELERY_BEAT_SCHEDULE = {
+    'obtener-datos-clima': {
+        'task': 'weather.tasks.obtener_datos_clima',
+        'schedule': timedelta(minutes=20),
+    },
+}
+
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'rpc://'
+
+# Configuración adicional de Celery (si es necesario)
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+CELERY_TASK_DEFAULT_EXCHANGE = 'default'
+CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
+CELERY_TASK_DEFAULT_EXCHANGE_TYPE = 'direct'
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
