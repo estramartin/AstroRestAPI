@@ -17,10 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.decorators.csrf import csrf_exempt
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
+from graphene_django.views import GraphQLView
 
 from users.api.router import router_user
 from categorias.Api.router import router_category
@@ -59,6 +60,7 @@ urlpatterns = [
     path('api/', include(router_order.urls)),
     path('api/', include(router_payment.urls)),
     path('weather-data/', clima, name="clima"),
+    path("graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]
 
 

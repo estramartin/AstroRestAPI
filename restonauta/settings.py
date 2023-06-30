@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_filters",
     'django_celery_beat',
+    "graphene_django",
 
     'users',
     'categorias',
@@ -134,6 +135,10 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',  # O utiliza 'asgi_channels.backends.ChannelsBackend' para producción
     },
+}
+
+GRAPHENE = {
+    "SCHEMA": "restonauta.schema.schema"
 }
 
 # Database
