@@ -16,7 +16,7 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-print(BASE_DIR)
+
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
@@ -32,9 +32,7 @@ TESTING_ENV = env.bool('TESTING_ENV')
 SECRET_KEY = 'django-insecure-pb0oji-+bza7&x%5m-2=chg#1(+d$-ta-53%fu%nmda1+-vo!2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = env.tuple('ALLOWED_HOSTS')
 
 
 # TOMORROW_IO
